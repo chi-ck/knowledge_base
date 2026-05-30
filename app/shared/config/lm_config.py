@@ -5,7 +5,6 @@ from dataclasses import dataclass
 
 from app.shared.config.common import env_float, env_str
 
-
 @dataclass
 class LLMConfig:
     base_url: str
