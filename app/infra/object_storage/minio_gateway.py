@@ -13,11 +13,11 @@ class MinIOGateway:
 
     @property
     def bucket_name(self)->str:
-        return infra_config.minio_bucket_name
+        return infra_config.minio.bucket_name
 
     @property
     def image_dir(self)->str:
-        return infra_config.minio_image_dir
+        return infra_config.minio.minio_img_dir
 
     def client(self) -> Minio:
         """获取 MinIO 客户端实例，用于上传、下载、查询文件等操作"""
