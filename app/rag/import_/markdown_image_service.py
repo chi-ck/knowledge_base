@@ -205,7 +205,7 @@ def backup_markdown(new_md_content: str, md_path_obj: Path) -> str:
     return str(new_md_path_obj)
 
 @step_log("enrich_markdown_images")
-def enrich_markdown_images(state: dict) -> dict:
+def enrich_markdown_images(state: ImportGraphState) -> ImportGraphState:
     """
     Markdown 图片增强服务：
     1. 扫描 Markdown 中的图片
