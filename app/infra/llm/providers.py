@@ -1,7 +1,7 @@
 from langchain_openai import ChatOpenAI
 
 from app.infra.config.providers import infra_config
-from app.shared.model import get_llm_client
+from app.shared.model import get_llm_client, get_bge_m3_ef, generate_embeddings
 
 
 class LLMProvider:
@@ -27,6 +27,27 @@ class LLMProvider:
         :return: 视觉模型客户端
         """
         return get_llm_client(model=infra_config.llm.lv_model)
+
+    def embedding_model(self):
+        """
+        获取 Embedding 模型对象。
+
+        Returns:
+            Any: BGE-M3 Embedding 模型实例。
+        """
+        return get_bge_m3_ef()
+
+    def embed_documents(self,texts:list[str])->dict:
+        """
+        为文本列表生成向量表示。
+
+        Args:
+            texts: 待向量化的文本列表。
+
+        Returns:
+            dict: 同时包含稠密向量与稀疏向量的结果字典。
+        """
+        return generate_embeddings(texts)
 
 # 创建全局唯一的 LLM 提供器实例，全项目通用，避免重复创建
 llm_provider = LLMProvider()
