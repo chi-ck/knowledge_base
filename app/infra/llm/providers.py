@@ -11,7 +11,7 @@ class LLMProvider:
     外部业务只需要调用 llm_provider 就能获取各种模型，不用关心底层配置
     """
 
-    def chat(self,model:None,json_mode:bool=False)->ChatOpenAI:
+    def chat(self,model:str=None,json_mode:bool=False)->ChatOpenAI:
         """
         获取【普通文本对话】LLM 客户端
         :param model: 可选，指定模型名称，不填则使用默认配置
