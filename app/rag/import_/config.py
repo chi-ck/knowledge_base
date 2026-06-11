@@ -26,7 +26,13 @@ ITEM_NAME_CONTEXT_CHUNK_K = 5
 # 主体识别上下文总字符数上限：防止上下文过长导致大模型输入超限
 ITEM_NAME_CONTEXT_TOTAL_MAX_CHARS = 10000
 
+# Milvus VARCHAR 字段最大长度（用于 title、item_name 等短文本）
+MILVUS_DEFAULT_VARCHAR_MAX_LENGTH = 512
+# Milvus content 字段最大长度（用于存储长文本内容）
+MILVUS_CHUNK_CONTENT_MAX_LENGTH = 65535
 # Milvus 向量维度（BGE-M3 稠密向量维度）
 MILVUS_VECTOR_DIM = 1024
-# Milvus VARCHAR 字段最大长度
-MILVUS_DEFAULT_VARCHAR_MAX_LENGTH = 512
+
+
+# 向量化批次大小：每批处理 5 条切片，避免显存溢出
+EMBEDDING_BATCH_SIZE = 5

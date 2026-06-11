@@ -1,4 +1,4 @@
-from app.shared.runtime.logger import node_log
+from app.shared.runtime.logger import logger,node_log
 from app.shared.utils.task_utils import add_done_task, add_running_task
 from app.process.import_.agent.state import ImportGraphState
 from app.rag.import_.index_service import index_chunks
@@ -6,10 +6,81 @@ from app.rag.import_.index_service import index_chunks
 @node_log("node_import_milvus")
 def node_import_milvus(state: ImportGraphState) -> ImportGraphState:
     """
-    节点: 导入向量库 (node_import_milvus)
-    为什么叫这个名字: 将处理好的向量数据写入 Milvus 数据库。
+    作用: 就是chunks存到milvus!
+    入参: chunks
+    出参: 不报错
+    步骤:
+          1. 日志+任务处理
+          2. 参数校验(chunks不为空)
+          3. 如果没有准备集合,我们创建集合(集合 schema indexs...)
+          4. 删除旧数据根据item_name
+          5. 插入本次的数据集合
+          6. 日志+任务处理
     """
+    # 入库是导入链最后一步，开始后意味着前面的解析、切分和向量化都已完成。
     add_running_task(state["task_id"], "node_import_milvus")
+    # 具体的建集合、删旧数据、插入新切片逻辑都封装在 rag 层 service 中。
     state = index_chunks(state)
     add_done_task(state["task_id"], "node_import_milvus")
     return state
+
+
+if __name__ == '__main__':
+    # --- 单元测试 ---
+    # 目的：验证 Milvus 导入节点的完整流程，包括连接、创建集合、清理旧数据和插入新数据。
+    import sys
+    import os
+    from dotenv import load_dotenv
+
+    # 加载环境变量 (自动寻找项目根目录的 .env)
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.dirname(os.path.dirname(current_dir))
+    load_dotenv(os.path.join(project_root, ".env"))
+
+    # 构造测试数据
+    dim = 1024
+    test_state = {
+        "task_id": "test_milvus_task",
+        "item_name":"测试项目_Milvus",
+        "chunks": [
+            {
+                "content": "Milvus 测试文本 1",
+                "title": "测试标题",
+                "item_name": "测试项目_Milvus",  # 必须有 item_name，用于幂等清理
+                "parent_title":"test.pdf",
+                "part":1,
+                "file_title": "test.pdf",
+                "dense_vector": [0.1] * dim,  # 模拟 Dense Vector
+                "sparse_vector": {1: 0.5, 10: 0.8}  # 模拟 Sparse Vector
+            }
+,
+            {
+                "content": "Milvus 测试文本 2",
+                "title": "测试标题2",
+                "item_name": "测试项目_Milvus2",  # 必须有 item_name，用于幂等清理
+                "parent_title": "test.pdf2",
+                "part": 1,
+                "file_title": "test.pdf2",
+                "dense_vector": [0.1] * dim,  # 模拟 Dense Vector
+                "sparse_vector": {1: 0.5, 10: 0.8}  # 模拟 Sparse Vector
+            }
+        ]
+    }
+
+    print("正在执行 Milvus 导入节点测试...")
+    try:
+        # 检查必要的环境变量
+        if not os.getenv("MILVUS_URL"):
+            print("❌ 未设置 MILVUS_URL，无法连接 Milvus")
+        elif not os.getenv("CHUNKS_COLLECTION"):
+            print("❌ 未设置 CHUNKS_COLLECTION")
+        else:
+            # 执行节点函数
+            result_state = node_import_milvus(test_state)
+
+            # 验证结果
+            chunks = result_state.get("chunks", [])
+            logger.info(f"返回结果:{chunks}")
+
+    except Exception as e:
+        print(f"❌ 测试失败: {e}")
