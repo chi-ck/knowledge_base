@@ -1,6 +1,7 @@
 import json
 import sys
 
+from app.infra.persistence.history_repository import history_repository
 from app.shared.runtime.logger import node_log
 from app.rag.query.item_name_confirm_service import confirm_item_name
 from app.shared.utils.task_utils import add_done_task, add_running_task
@@ -16,6 +17,15 @@ def node_item_name_confirm(state):
     add_running_task(state["session_id"], sys._getframe().f_code.co_name, state["is_stream"])
     # 调用 rag/query service 层
     state = confirm_item_name(state)
+
+    # 保存聊天记录
+    history_repository.save_message(
+        session_id=state["session_id"],
+        role="user",
+        text=state["original_query"],
+        rewritten_query="空 占位"
+    )
+
     # 识别完成后写入完成列表，方便前端展示当前节点已结束。
     add_done_task(state["session_id"], sys._getframe().f_code.co_name, state["is_stream"])
     return state
