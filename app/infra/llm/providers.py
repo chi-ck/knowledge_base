@@ -1,7 +1,7 @@
 from langchain_openai import ChatOpenAI
 
 from app.infra.config.providers import infra_config
-from app.shared.model import get_llm_client, get_bge_m3_ef, generate_embeddings
+from app.shared.model import get_llm_client, get_bge_m3_ef, generate_embeddings, get_reranker_model
 
 
 class LLMProvider:
@@ -48,6 +48,9 @@ class LLMProvider:
             dict: 同时包含稠密向量与稀疏向量的结果字典。
         """
         return generate_embeddings(texts)
+
+    def reranker_model(self):
+        return get_reranker_model()
 
 # 创建全局唯一的 LLM 提供器实例，全项目通用，避免重复创建
 llm_provider = LLMProvider()

@@ -10,8 +10,18 @@ def node_search_embedding(state):
     节点功能：进行向量内容检索
     """
     add_running_task(state["session_id"], sys._getframe().f_code.co_name, state.get("is_stream"))
-    state = search_by_embedding(state)
+    mivlus_result = search_by_embedding(state)
     add_done_task(state["session_id"], sys._getframe().f_code.co_name, state.get("is_stream"))
     return {
-        "embedding_chunks": []
+        "embedding_chunks": mivlus_result
     }
+
+if __name__ == "__main__":
+    test_state = {
+        "session_id": "test_search_embedding_001",
+        "rewritten_query": "HAK 180 烫金机使用说明",
+        "item_names": ["HAK 180 烫金机"],
+        "is_stream": False,
+    }
+    result = node_search_embedding(test_state)
+    print(result)

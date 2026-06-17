@@ -41,6 +41,11 @@ app.add_middleware(
     allow_headers = ['*']
 )
 
+@app.get("/html")
+def query_html():
+    html_path = PROJECT_ROOT / "app" / "process" / "query" / "page" / "chat.html"
+    return FileResponse(path=html_path, media_type=guess_type(html_path.name)[0])
+
 def run_query_graph(query:str,session_id:str,is_stream:bool):
     # 一会回调用 main_graph执行
     # 本次任务开启了！ is_stream = True 把结果加入到队列，sse可以取到

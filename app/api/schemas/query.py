@@ -24,7 +24,7 @@ class QueryResponse(BaseModel):
     session_id: str = Field(..., description="会话ID")
     message: str = Field(..., description="响应信息")
     answer: str = Field("", description="答案")
-    image_urls: list[str]
+    image_urls: list[str]|None = None
     done_list: list[str]
 
 
@@ -43,7 +43,7 @@ class HistoryItem(BaseModel):
     rewritten_query: str = ""
 
     item_names: list[str]
-    image_urls: list[str]
+    image_urls: list[str]|None = None
 
     ts: Any = None
 
